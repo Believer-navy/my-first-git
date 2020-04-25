@@ -1,15 +1,19 @@
 import React from "react";
-import "./PhoneList.css";
 import PhoneItem from "../PhoneItem";
+import styled from "styled-components";
 
+const PhoneWrapper = styled.div`
+	display:flex;
+	flex-direction: column;
+`;
 
 const PhoneList = () => {
 	return (
-		<div className="phone_list">
+		<PhoneWrapper>
 			<PhoneItem />
 			<PhoneItem />
 			<PhoneItem />
-		</div>	
+		</PhoneWrapper>	
 	);
 };
 
