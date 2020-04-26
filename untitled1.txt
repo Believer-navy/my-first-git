@@ -1,3 +1,124 @@
-// Todo 
+Day 3.
 
-test1에서 모듈 다운받기...
+State와 Props로 데이터를 받는법을 코딩
+
+이를 전화번호부 프로젝트로 연계 (전화번호부 데이터를 화면에 출력)
+
+기존의 전화번호부 프로젝트 App.js는 함수형 컴포넌트 (function) 이였지만
+
+state를 사용하기위해 클래스 컴포넌트형식으로 변환 
+--> class App extends Componet {
+	state = dummyData;
+	
+	render() {
+		return (
+			<div className="container">
+				<InputBox />
+				<PhoneList />
+			</div>
+		);
+	}
+}
+
+더미데이터를 불러오고 state로 선언  ----- > PhoneList 컴포넌트에 state 값을 list 라는 이름의 props로 넘김.. 
+
+PhoneList 컴포넌트에서 ({ list }) 형식으로 전환 --> 개별데이터를 부속 컴포넌트인 PhoneItem에 전달..
+
+Destructing Assignment문법활용으로 더 간결한 코드형식으로 Phonelist state 값을 PhoneItem 에 전달가능..
+
+dummyData에 "5"라는 키값을 가진 데이터를 출력해도 list 데이터에 하나하나 props를 넣어줘야하기때문에 비효율적 이는 map함수를 통해 해결한다..
+
+{Object.values(list).map(item => {
+				return <PhoneItem {...item} key={item.id} />;
+			})}
+			
+Object.values(list)를 통해 Json dummyList의 value값으로만 이루어져있는 배열을 만듦. 그리고 map함수를 통해 데이터의 갯수만큼 <PhoneItem>컴포넌트를 만들고, 데이터 값을 props로 전달... 여기서 넘어간 props는 {...item} (id,name,phone)으로 총3개
+Destructing Assignment문법활용을 통한 좀더 효율적인 props전달
+
+여기서 ket라는 속성은 map 함수를 통해 반복적으로 컴포넌트를 생성해줄때 필수적으로 넣어야하는 속성이다. 만약 key값을 지정해주지 않는다면 에러가 발생하며 프로젝트가 실행하지않음.. --> React는 업데이트 부분만 잡아 변경해준다 이는 key 값을 지정하지않으면 업데이트가 된 부분을 잡아내기위해 하나하나 비교를 함  --> 하지만 key값을 지정해준다면 그 값을 통해 업데이트된 부분을 빠르게 잡아낼 수 있어 속도가 매우향상 
+보통 key값은 id값과 같이 unieque(고유) 값으로 지정한다 
+
+input값을 state로 관리하기
+--> state = dummyData였던 값에 name과 phone값을 추가 (input을 통한 데이터추가를위해) 그리고 handleInput이라는 함수를 만들어 InputBox컴포넌트에 Props로 전달해주었다 --> <InputBox 
+					name={name}
+					phone={phone}
+					onChange={handleInput}
+		/> 형식..
+		
+handleInput = e => {
+		this.setState({
+			[e.target.name]: e.target.value
+		});
+	}; 
+
+e.target은 해당 이벤트가 발생한 element를 가리킨다. e.target.name은 이벤트가 발생한 Element의 name 속성값을 가져오고 e.target.value는 이벤트가 발생한 Element의 value속성 값을 가져오는것이다. 이는 InputBox 컴포넌트에 들어있는 2개의 Input태그의 name속성값을 각각 name,phone으로 지정했다. 그럼 만약 name 속성값으로 phone을 가지는 input 태그에 0을 입력하면 handleInput 함수에서는 this.setState({phone:"0"}); 이 실행된다 위와 같은 이유로 App.js의 state에서도 key값을 name과 phone으로 지정 .. 
+
+
+dummyData에 6,7,8...처럼 id값을 추가하기위해 nextId 변수선언을한다
+export var nexId = Object.keys(dummyData).length; 
+여기서 Object.keys함수는 key값으로 배열을 만들어 반환하는 함수이다. 처음 생성될때 dummyData는 key 값으로 "1","2","3","4"... 를 가지고있으므로 Object.keys(dummyData)의 반환값은 [1,2,3,4,5]가 될것이다.
+
+
+
+handleSubmit 함수를 만들고 onSubmit이라는 이름의 props를 InputBox에 전달 
+	handleSubmit = () => {
+		const { dummyData, name, phone } = this.state;
+		
+		if(name === "" || phone === "") return;
+		
+		this.setState({
+			dummyData: {
+				...dummyData,
+				[nextId]: {
+				id: nextId,
+				name,
+				phone
+			  }
+			},
+			name: "",
+			phone: ""
+		});
+		
+		setNextId();
+	}
+	
+1.state로부터 dummyData, name, phone 을 받아와 name값과 phone값이 빈값이 아닌지를 체크
+
+2. 입력버튼이 눌리면 input 태그의 값을 모두 지우기위해 name과 phone값을 공백으로 설정 dummyData부분에서는 Spread문법으로 기존에 있던 내용을 모두 넣어준뒤 새로 입력받은 값을 추가해줌.. 이후 setNextId(); 함수를통해 dummyData.js의 nextId 값을 1 더해줌
+
+
+handleRemove함수는 Destructing Assignment와 Spread문법을 모두사용
+	handleRemove = id => {
+		const { [id]: _, ...dummyData } = this.state.dummyData;
+		
+		this.setState({dummyData});
+	};
+먼저 [id]:_ 를통해 제거하고싶은 아이템을 _라는 변수로 할당 그리고 Spread문법을 통해
+제외한 아이템을 뺀 데이터를 dummyData에 저장한다. 그런다음 setState함수에 dummyData를 넘겨주면 올바르게 데이터를 변경할수있다.
+
+이를 PhoneItem 컴포넌트에서
+
+const PhoneItem = ({id, name, phone, onClick}) => {
+  return (
+    <div className={styles.phone_item}>
+      <div className={styles.phone_item_left}>
+        <div className={styles.phone_item_name}>{name}</div>
+        <div className={styles.phone_item_phone}>{phone}</div>
+      </div>
+      <div className={styles.phone_item_right}>
+        <button onclick={() => onClick(id)}>삭제</button>
+      </div>
+    </div>
+  );
+};
+
+형식으로 props로 전달받은 onClick 함수를 button onClick 이벤트 핸들러로 지정했다.
+다만 "onClick={onClick(id)}"라고 적지않은 이유는 React에서 이런 이벤트 핸들러로 함수 레퍼런스, 즉 함수 그자체를 전달해야 하기 때문이다. 따라서 onClick과 같은 이벤트 속성에서 핸들러를 전달할때에는 "onClick={onClick}"과 같이 소괄호를 제외하고 보낸다. 
+
+다만 여기서는 onClick함수가 id 파라미터를 받기때문에 Arrow Function으로 새 함수를 만들고 이를 전달
+
+
+	
+
+
+

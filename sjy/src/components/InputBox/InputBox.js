@@ -3,7 +3,7 @@
 import React from "react";
 import "./InputBox.css";
 
-const InputBox = () => {
+const InputBox = ({name,phone,onChange,onSubmit}) => {
 	return (
 		<div className="input_boxes">
 			<div className="input_box">
@@ -13,6 +13,8 @@ const InputBox = () => {
 					placeholder="이름"
 					name="name"
 					className="input_box_input"
+					onChange={onChange}
+					value={name}
 				/>
 			</div>
 			<div className="input_box">
@@ -22,9 +24,11 @@ const InputBox = () => {
 					placeholder="전화번호"
 					name="phone"
 					className="input_box_input"
+					onChange={onChange}
+					value={phone}
 				/>
 			</div>
-			<button className="input_box_button">저장</button>
+			<button className="input_box_button" onClick={onSubmit}>저장</button>
 		</div>
 	);
 };

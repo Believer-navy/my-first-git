@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react';
 import Number from "./components/Number";
+import CountButton from "./components/CountButton";
 import styled from "styled-components";
 
 const Wrapper = styled.div`
@@ -49,8 +50,8 @@ class App extends Component {
 		return (
 			<Wrapper>
 				<ButtonWrapper>
-					<button onClick={countUp}>+</button>
-					<button onClick={countDown}>-</button>
+					<CountButton onClick={countUp} text="+"/>
+					<CountButton onClick={countDown} text="-"/>
 				</ButtonWrapper>
 				{number}
 			</Wrapper>
